@@ -1,14 +1,27 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { PrismaClient } from '@prisma/client';
+
 
 const CLE_SECRETE_JWT = "wtz2";
+const prisma = new PrismaClient();
 
 // Inscription d'un utilisateur
 export const inscrireUtilisateur = async (req, res) => {
   try {
+    console.log('Données reçues pour l\'inscription:', req.body); // Log des données reçues
+
     const { nom, email, mot_de_passe } = req.body;
+
+    // Vérification des données entrantes
+    if (!nom || !email || !mot_de_passe) {
+      return res.status(400).json({ erreur: 'Tous les champs sont obligatoires.' });
+    }
+
+    console.log('Hashing du mot de passe...');
     const motDePasseHashe = await bcrypt.hash(mot_de_passe, 10);
 
+    console.log('Création de l\'utilisateur...');
     const utilisateur = await prisma.utilisateurs.create({
       data: {
         nom,
@@ -17,11 +30,14 @@ export const inscrireUtilisateur = async (req, res) => {
       },
     });
 
-    res.status(201).json({ message: "Utilisateur créé avec succès.", utilisateur });
+    console.log('Utilisateur créé avec succès.');
+    res.status(201).json({ message: 'Utilisateur créé avec succès.', utilisateur });
   } catch (erreur) {
-    res.status(500).json({ erreur: "Erreur lors de l'inscription.", details: erreur });
+    console.error('Erreur lors de l\'inscription:', erreur); // Log de l'erreur
+    res.status(500).json({ erreur: 'Erreur lors de l\'inscription.', details: erreur.message || erreur });
   }
 };
+
 
 // Connexion d'un utilisateur
 export const connecterUtilisateur = async (req, res) => {

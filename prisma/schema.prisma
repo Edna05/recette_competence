@@ -12,7 +12,6 @@ model utilisateurs {
   nom         String
   email       String   @unique
   mot_de_passe String
-  cree_a      DateTime @default(now())
   recettes    recettes[]
 }
 
