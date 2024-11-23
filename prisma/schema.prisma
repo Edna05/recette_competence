@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model utilisateurs {
+  id          Int      @id @default(autoincrement())
+  nom         String
+  email       String   @unique
+  mot_de_passe String
+  cree_a      DateTime @default(now())
+  recettes    recettes[]
+}
+
+model recettes {
+  id              Int      @id @default(autoincrement())
+  titre           String
+  description     String?
+  ingredients     Json
+  etapes          Json
+  image           String?
+  temps_cuisson   Int
+  minuteur        Int?
+  portions        Int
+  utilisateur_id  Int
+  utilisateur     utilisateurs @relation(fields: [utilisateur_id], references: [id])
+}
